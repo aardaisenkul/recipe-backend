@@ -11,13 +11,14 @@ async function migrate() {
     process.exit(1);
   }
 
+  // Log the database URL (without password) for debugging
   console.log('Database URL:', process.env.DATABASE_URL.replace(/:[^:@]+@/, ':****@'));
 
   const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
-    ssl: {
+    ssl: process.env.NODE_ENV === 'production' ? {
       rejectUnauthorized: false
-    }
+    } : undefined
   });
 
   try {

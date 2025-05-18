@@ -8,4 +8,7 @@ healthcheckPath = "/"
 healthcheckTimeout = 300
 
 [deploy.migrations]
-command = "ts-node src/db/migrate.ts" 
+command = "ts-node src/db/migrate.ts"
+
+DATABASE_URL=postgresql://${{PGUSER}}:${{POSTGRES_PASSWORD}}@${{RAILWAY_PRIVATE_DOMAIN}}:5432/${{PGDATABASE}}
+NODE_ENV=production 
