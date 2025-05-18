@@ -13,6 +13,11 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
+// Health check endpoint
+app.get('/', (req, res) => {
+  res.json({ status: 'ok', message: 'Server is running' });
+});
+
 // Routes
 app.use('/api/auth', userRoutes);
 app.use('/api/recipes', recipeRoutes);
