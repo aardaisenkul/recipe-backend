@@ -8,4 +8,4 @@ healthcheckPath = "/"
 healthcheckTimeout = 300
 
 [deploy.migrations]
-command = "node -e \"require('pg').Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } }).query(require('fs').readFileSync('src/db/schema.sql', 'utf8')).then(() => process.exit(0)).catch(e => { console.error(e); process.exit(1); });\"" 
+command = "ts-node src/db/migrate.ts" 
