@@ -109,8 +109,9 @@ export class UserModel {
       console.log('Deleting user:', id);
       const query = 'DELETE FROM users WHERE id = $1';
       const result = await this.pool.query(query, [id]);
-      console.log('Delete result:', result.rowCount > 0);
-      return result.rowCount ? result.rowCount > 0 : false;
+      const deleted = result.rowCount !== null && result.rowCount > 0;
+      console.log('Delete result:', deleted);
+      return deleted;
     } catch (error) {
       console.error('Error in delete user:', error);
       throw error;
