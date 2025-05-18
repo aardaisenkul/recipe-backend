@@ -8,8 +8,8 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "postinstall": "npm run build",
-    "migrate": "psql -d recipe_app -f src/db/migrations.sql",
-    "clear": "psql -d recipe_app -f src/db/clear.sql",
+    "migrate": "psql $DATABASE_URL -f src/db/schema.sql",
+    "clear": "psql $DATABASE_URL -f src/db/clear.sql",
     "seed": "ts-node src/db/seed.ts"
   },
   "keywords": [],
