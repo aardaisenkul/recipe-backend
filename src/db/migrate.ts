@@ -6,6 +6,13 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 async function migrate() {
+  if (!process.env.DATABASE_URL) {
+    console.error('DATABASE_URL is not set in environment variables');
+    process.exit(1);
+  }
+
+  console.log('Database URL:', process.env.DATABASE_URL.replace(/:[^:@]+@/, ':****@'));
+
   const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: {
@@ -16,8 +23,8 @@ async function migrate() {
   try {
     // Test connection
     console.log('Testing database connection...');
-    await pool.query('SELECT NOW()');
-    console.log('Database connection successful!');
+    const result = await pool.query('SELECT NOW()');
+    console.log('Database connection successful!', result.rows[0]);
 
     // Read and execute schema
     console.log('Reading schema file...');
