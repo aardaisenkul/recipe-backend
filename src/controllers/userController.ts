@@ -2,7 +2,12 @@ import { Response } from 'express';
 import { UserModel } from '../models/User';
 import { AuthRequest } from '../middleware/auth';
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
+import jwt, { SignOptions, Secret } from 'jsonwebtoken';
+
+interface JWTPayload {
+  id: number;
+  email: string;
+}
 
 /**
  * UserController class
@@ -10,9 +15,16 @@ import jwt from 'jsonwebtoken';
  */
 export class UserController {
   private userModel: UserModel;
+  private readonly jwtSecret: Secret;
+  private readonly jwtExpiresIn: SignOptions['expiresIn'];
 
   constructor(userModel: UserModel) {
     this.userModel = userModel;
+    if (!process.env.JWT_SECRET) {
+      throw new Error('JWT_SECRET is not defined in environment variables');
+    }
+    this.jwtSecret = process.env.JWT_SECRET;
+    this.jwtExpiresIn = (process.env.JWT_EXPIRES_IN || '24h') as SignOptions['expiresIn'];
   }
 
   /**
@@ -39,11 +51,9 @@ export class UserController {
       );
 
       // Generate JWT token
-      const token = jwt.sign(
-        { id: user.id, email: user.email },
-        process.env.JWT_SECRET!,
-        { expiresIn: process.env.JWT_EXPIRES_IN }
-      );
+      const payload: JWTPayload = { id: user.id, email: user.email };
+      const signOptions: SignOptions = { expiresIn: this.jwtExpiresIn };
+      const token = jwt.sign(payload, this.jwtSecret, signOptions);
 
       // Send response without password
       const { password, ...userWithoutPassword } = user;
@@ -76,11 +86,9 @@ export class UserController {
       }
 
       // Generate JWT token
-      const token = jwt.sign(
-        { id: user.id, email: user.email },
-        process.env.JWT_SECRET!,
-        { expiresIn: process.env.JWT_EXPIRES_IN }
-      );
+      const payload: JWTPayload = { id: user.id, email: user.email };
+      const signOptions: SignOptions = { expiresIn: this.jwtExpiresIn };
+      const token = jwt.sign(payload, this.jwtSecret, signOptions);
 
       // Send response without password
       const { password, ...userWithoutPassword } = user;
