@@ -36,19 +36,31 @@ export class UserController {
    */
   async register(req: AuthRequest, res: Response): Promise<void> {
     try {
+      console.log('Registration attempt:', { email: req.body.email, username: req.body.username });
+      
+      // Validate request body
+      if (!req.body.email || !req.body.password || !req.body.username) {
+        console.error('Missing required fields:', req.body);
+        res.status(400).json({ error: 'Email, password, and username are required' });
+        return;
+      }
+
       // Check if user already exists
       const existingUser = await this.userModel.findByEmail(req.body.email);
       if (existingUser) {
+        console.log('User already exists:', req.body.email);
         res.status(400).json({ error: 'Email already registered' });
         return;
       }
 
       // Create new user
+      console.log('Creating new user...');
       const user = await this.userModel.create(
         req.body.username,
         req.body.email,
         req.body.password
       );
+      console.log('User created successfully:', { id: user.id, email: user.email });
 
       // Generate JWT token
       const payload: JWTPayload = { id: user.id, email: user.email };
@@ -59,7 +71,8 @@ export class UserController {
       const { password, ...userWithoutPassword } = user;
       res.status(201).json({ user: userWithoutPassword, token });
     } catch (error) {
-      res.status(400).json({ error: 'Error registering user' });
+      console.error('Registration error:', error);
+      res.status(400).json({ error: 'Error registering user', details: error instanceof Error ? error.message : 'Unknown error' });
     }
   }
 
